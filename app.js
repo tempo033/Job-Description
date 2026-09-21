@@ -373,4 +373,6 @@ loadJobs();
     showView("jobs");
   }
   window.openEmployeeForm=populateEmployeeForm;window.renderEmployeesPanel=renderEmployeesPanel;window.refreshMainDepartments=renderMainDepartments;window.loadEmployees=loadEmployees;window.loadJobs=loadJobs;
+  /* تفعيل واجهة الموظفين والتقييم بعد تحميل عناصر الصفحة. */
+  initNewUI();
 })();
