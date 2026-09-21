@@ -75,10 +75,15 @@
 
     showMainView("jobs");
     if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
-    /* app.js loads الوظائف asynchronously؛ أعد رسم القائمة الجانبية فور وصول البيانات. */
+    /* تأكد من تحميل مكتبة الوظائف قبل بناء القائمة الجانبية، ثم أعد رسمها بعد اكتمال الطلب. */
+    if(typeof window.loadJobs==="function"){
+      Promise.resolve(window.loadJobs()).then(function(){
+        if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
+      }).catch(function(err){console.error("Job library load failed:",err);});
+    }
     (function refreshJobMenu(attempt){
       if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
-      if(attempt < 12) setTimeout(function(){refreshJobMenu(attempt+1);},300);
+      if(attempt < 20) setTimeout(function(){refreshJobMenu(attempt+1);},250);
     })(0);
     if(typeof window.loadEmployees==="function"){
       Promise.resolve(window.loadEmployees()).then(function(){
