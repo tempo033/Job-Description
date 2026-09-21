@@ -224,15 +224,77 @@ loadJobs();
     q("#jobDepartments").innerHTML=ds.map(d=>'<button class="dept '+(typeof activeDept!=="undefined"&&activeDept===d?"active":"")+'" data-newdept="'+esc2(d)+'"><span>'+esc2(d)+'</span><b>'+jobs.filter(j=>j.department===d).length+'</b></button>').join("");
   }
 
+  const selectedEmployeeIds=new Set();
+
+  function getVisibleEmployees(){
+    const search=(q("#employeeSearch")?.value||"").trim().toLowerCase(), dep=q("#employeeDeptFilter")?.value||"";
+    return (employees||[]).filter(e=>(!dep||e.department===dep)&&[e.name,e.employee_no,e.job_title,e.national_id,e.nationality].join(" ").toLowerCase().includes(search));
+  }
+
+  function updateEmployeeSelectionInfo(){
+    const info=q("#employeeSelectionInfo");
+    if(!info)return;
+    const count=selectedEmployeeIds.size;
+    info.textContent=count?("تم تحديد "+count+" موظف"): "لم يتم تحديد أي موظف";
+    info.classList.toggle("has-selection",count>0);
+  }
+
   function renderEmployeesPanel(){
     const box=q("#employeesTable"); if(!box)return;
-    const search=(q("#employeeSearch")?.value||"").trim().toLowerCase(), dep=q("#employeeDeptFilter")?.value||"";
     const ds=deptNames();
+    const dep=q("#employeeDeptFilter")?.value||"";
+    const search=(q("#employeeSearch")?.value||"").trim().toLowerCase();
     q("#employeeDeptFilter").innerHTML='<option value="">كل الإدارات</option>'+ds.map(d=>'<option value="'+esc2(d)+'">'+esc2(d)+'</option>').join("");
     q("#employeeDeptFilter").value=dep;
-    const list=(employees||[]).filter(e=>(!dep||e.department===dep)&&[e.name,e.employee_no,e.job_title,e.national_id,e.nationality].join(" ").toLowerCase().includes(search));
-    box.innerHTML='<div class="employee-row head"><div>الموظف</div><div>الهوية</div><div>الإدارة / المسمى</div><div>الحالة</div><div>الإجراءات</div></div>'+
-      (list.length?list.map(e=>{const j=linkedJob(e);return '<div class="employee-row"><div><div class="employee-name">'+esc2(e.name)+'</div><div class="employee-meta">'+esc2(e.employee_no||"بدون رقم")+'</div></div><div>'+esc2(e.national_id||"—")+'</div><div><b>'+esc2(e.department||j?.department||"—")+'</b><div class="employee-meta">'+esc2(e.job_title||j?.name||"غير مسند")+'</div></div><div>'+esc2(e.status||"—")+'</div><div class="row-actions"><button class="small-btn" data-newfile="'+e.id+'">فتح الملف</button><button class="small-btn gold" data-newedit="'+e.id+'">تعديل / إسناد</button><button class="small-btn" data-neweval="'+e.id+'">تقييم</button><button class="small-btn danger" data-newdelete="'+e.id+'">حذف</button></div></div>'}).join(""):'<div class="empty">لا توجد بيانات موظفين. استورد Excel أو أضف موظفًا.</div>');
+    const list=getVisibleEmployees();
+    const visibleIds=list.map(e=>e.id);
+    const allVisibleSelected=list.length>0&&list.every(e=>selectedEmployeeIds.has(e.id));
+    box.innerHTML='<div class="employee-row head"><div class="employee-check-head"><input type="checkbox" id="selectVisibleEmployees" '+(allVisibleSelected?"checked":"")+' aria-label="تحديد الموظفين الظاهرين"><span>تحديد</span></div><div>الموظف</div><div>الهوية</div><div>الإدارة / المسمى</div><div>الحالة</div><div>الإجراءات</div></div>'+
+      (list.length?list.map(e=>{const j=linkedJob(e);return '<div class="employee-row '+(selectedEmployeeIds.has(e.id)?"selected":"")+'"><div class="employee-check"><input type="checkbox" class="employee-select" data-employee-check="'+e.id+'" '+(selectedEmployeeIds.has(e.id)?"checked":"")+' aria-label="تحديد '+esc2(e.name)+'"></div><div><div class="employee-name">'+esc2(e.name)+'</div><div class="employee-meta">'+esc2(e.employee_no||"بدون رقم")+'</div></div><div>'+esc2(e.national_id||"—")+'</div><div><b>'+esc2(e.department||j?.department||"—")+'</b><div class="employee-meta">'+esc2(e.job_title||j?.name||"غير مسند")+'</div></div><div>'+esc2(e.status||"—")+'</div><div class="row-actions"><button class="small-btn" data-newfile="'+e.id+'">فتح الملف</button><button class="small-btn gold" data-newedit="'+e.id+'">تعديل / إسناد</button><button class="small-btn" data-neweval="'+e.id+'">تقييم</button><button class="small-btn danger" data-newdelete="'+e.id+'">حذف</button></div></div>}).join(""):'<div class="empty">لا توجد بيانات موظفين مطابقة للبحث الحالي.</div>');
+    updateEmployeeSelectionInfo();
+  }
+
+  function toggleEmployeeSelection(id, checked){
+    if(checked) selectedEmployeeIds.add(id); else selectedEmployeeIds.delete(id);
+    renderEmployeesPanel();
+  }
+
+  function selectVisibleEmployees(){
+    const list=getVisibleEmployees();
+    list.forEach(e=>selectedEmployeeIds.add(e.id));
+    renderEmployeesPanel();
+  }
+
+  function clearEmployeeSelection(){
+    selectedEmployeeIds.clear();
+    renderEmployeesPanel();
+  }
+
+  async function deleteSelectedEmployees(){
+    const ids=[...selectedEmployeeIds];
+    if(!ids.length){alert("حدد موظفًا واحدًا على الأقل أولاً.");return}
+    if(!confirm("هل أنت متأكد من حذف "+ids.length+" موظف؟ سيتم حذف ملفاتهم وتقييماتهم المرتبطة أيضًا."))return;
+    for(const id of ids){
+      const r=await db.from("employees").delete().eq("id",id);
+      if(r.error){alert("تعذر حذف أحد الموظفين: "+r.error.message);await loadEmployees();selectedEmployeeIds.clear();renderEmployeesPanel();return}
+    }
+    selectedEmployeeIds.clear();
+    await loadEmployees();
+    renderEmployeesPanel();
+    alert("تم حذف "+ids.length+" موظف بنجاح.");
+  }
+
+  async function deleteAllEmployees(){
+    if(!(employees||[]).length){alert("لا توجد بيانات موظفين للحذف.");return}
+    const count=employees.length;
+    if(!confirm("تحذير: سيتم حذف جميع الموظفين وعددهم "+count+" موظفًا نهائيًا. هل تريد المتابعة؟"))return;
+    if(!confirm("تأكيد أخير: حذف جميع الموظفين من قاعدة البيانات؟"))return;
+    const r=await db.from("employees").delete();
+    if(r.error){alert("تعذر حذف جميع الموظفين: "+r.error.message);return}
+    selectedEmployeeIds.clear();
+    employees=[];
+    renderEmployeesPanel();
+    alert("تم حذف جميع الموظفين بنجاح.");
   }
 
   function populateEmployeeForm(id){
@@ -277,8 +339,22 @@ loadJobs();
     q("#jobNav").addEventListener("click",()=>q("#jobDepartments").classList.toggle("collapsed"));
     q("#addEmployeeBtn").addEventListener("click",()=>populateEmployeeForm(""));
     q("#startEvaluationBtn").addEventListener("click",()=>window.openEvaluation());
-    q("#employeeSearch").addEventListener("input",renderEmployeesPanel);
-    q("#employeeDeptFilter").addEventListener("change",renderEmployeesPanel);
+    q("#employeeSearch").addEventListener("input",()=>{selectedEmployeeIds.clear();renderEmployeesPanel()});
+    q("#employeeDeptFilter").addEventListener("change",()=>{selectedEmployeeIds.clear();renderEmployeesPanel()});
+    q("#selectAllEmployees").addEventListener("click",selectVisibleEmployees);
+    q("#clearEmployeeSelection").addEventListener("click",clearEmployeeSelection);
+    q("#deleteSelectedEmployees").addEventListener("click",deleteSelectedEmployees);
+    q("#deleteAllEmployees").addEventListener("click",deleteAllEmployees);
+    q("#employeesTable").addEventListener("change",ev=>{
+      const checkbox=ev.target.closest("[data-employee-check]");
+      if(checkbox) toggleEmployeeSelection(checkbox.dataset.employeeCheck,checkbox.checked);
+      if(ev.target.id==="selectVisibleEmployees"){
+        if(ev.target.checked) selectVisibleEmployees(); else {
+          getVisibleEmployees().forEach(e=>selectedEmployeeIds.delete(e.id));
+          renderEmployeesPanel();
+        }
+      }
+    });
     q("#eDept").addEventListener("change",()=>fillEmployeeJobs(q("#eDept").value,""));
     q("#eJob").addEventListener("change",showLinkedJob);
     q("#employeeForm").addEventListener("submit",saveEmployeeForm);
