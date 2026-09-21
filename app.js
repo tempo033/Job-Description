@@ -289,8 +289,10 @@ loadJobs();
     const count=employees.length;
     if(!confirm("تحذير: سيتم حذف جميع الموظفين وعددهم "+count+" موظفًا نهائيًا. هل تريد المتابعة؟"))return;
     if(!confirm("تأكيد أخير: حذف جميع الموظفين من قاعدة البيانات؟"))return;
-    const r=await db.from("employees").delete();
-    if(r.error){alert("تعذر حذف جميع الموظفين: "+r.error.message);return}
+    for(const e of [...employees]){
+      const r=await db.from("employees").delete().eq("id",e.id);
+      if(r.error){alert("تعذر حذف الموظف "+(e.name||"")+" : "+r.error.message);return}
+    }
     selectedEmployeeIds.clear();
     employees=[];
     renderEmployeesPanel();
@@ -339,21 +341,23 @@ loadJobs();
     q("#jobNav").addEventListener("click",()=>q("#jobDepartments").classList.toggle("collapsed"));
     q("#addEmployeeBtn").addEventListener("click",()=>populateEmployeeForm(""));
     q("#startEvaluationBtn").addEventListener("click",()=>window.openEvaluation());
-    q("#employeeSearch").addEventListener("input",()=>{selectedEmployeeIds.clear();renderEmployeesPanel()});
-    q("#employeeDeptFilter").addEventListener("change",()=>{selectedEmployeeIds.clear();renderEmployeesPanel()});
-    q("#selectAllEmployees").addEventListener("click",selectVisibleEmployees);
-    q("#clearEmployeeSelection").addEventListener("click",clearEmployeeSelection);
-    q("#deleteSelectedEmployees").addEventListener("click",deleteSelectedEmployees);
-    q("#deleteAllEmployees").addEventListener("click",deleteAllEmployees);
-    q("#employeesTable").addEventListener("change",ev=>{
+    document.addEventListener("input",ev=>{
+      if(ev.target.id==="employeeSearch"){selectedEmployeeIds.clear();renderEmployeesPanel();}
+    });
+    document.addEventListener("change",ev=>{
+      if(ev.target.id==="employeeDeptFilter"){selectedEmployeeIds.clear();renderEmployeesPanel();return;}
       const checkbox=ev.target.closest("[data-employee-check]");
-      if(checkbox) toggleEmployeeSelection(checkbox.dataset.employeeCheck,checkbox.checked);
+      if(checkbox){toggleEmployeeSelection(checkbox.dataset.employeeCheck,checkbox.checked);return;}
       if(ev.target.id==="selectVisibleEmployees"){
-        if(ev.target.checked) selectVisibleEmployees(); else {
-          getVisibleEmployees().forEach(e=>selectedEmployeeIds.delete(e.id));
-          renderEmployeesPanel();
-        }
+        if(ev.target.checked) selectVisibleEmployees();
+        else {getVisibleEmployees().forEach(e=>selectedEmployeeIds.delete(e.id));renderEmployeesPanel();}
       }
+    });
+    document.addEventListener("click",ev=>{
+      if(ev.target.closest("#selectAllEmployees")){ev.preventDefault();selectVisibleEmployees();return;}
+      if(ev.target.closest("#clearEmployeeSelection")){ev.preventDefault();clearEmployeeSelection();return;}
+      if(ev.target.closest("#deleteSelectedEmployees")){ev.preventDefault();deleteSelectedEmployees();return;}
+      if(ev.target.closest("#deleteAllEmployees")){ev.preventDefault();deleteAllEmployees();return;}
     });
     q("#eDept").addEventListener("change",()=>fillEmployeeJobs(q("#eDept").value,""));
     q("#eJob").addEventListener("change",showLinkedJob);
