@@ -152,6 +152,12 @@ function performanceLevel(score){
   if(score>=60)return"يحتاج إلى تحسين";
   return"يحتاج إلى خطة تطوير";
 }
+async function loadEmployees(){
+  const r=await db.from("employees").select("*");
+  if(r.error){console.error("تعذر تحميل الموظفين:",r.error);return false}
+  employees=r.data||[];
+  return true;
+}
 async function openEvaluation(){
   const er=await db.from("employees").select("*");
   if(er.error){alert("تعذر تحميل قاعدة بيانات الموظفين.");return}
@@ -194,7 +200,7 @@ loadJobs();
     document.querySelectorAll(".view").forEach(v=>v.classList.add("hidden"));
     q("#"+name+"View")?.classList.remove("hidden");
     document.querySelectorAll(".main-nav").forEach(n=>n.classList.toggle("active",n.dataset.view===name));
-    if(name==="employees") renderEmployeesPanel();
+    if(name==="employees"){ loadEmployees().then(()=>renderEmployeesPanel()); }
     if(name==="evaluation") renderEvaluationPanel();
   }
 
@@ -272,5 +278,5 @@ loadJobs();
     showView("jobs");
   }
   window.openEmployeeForm=populateEmployeeForm;window.renderEmployeesPanel=renderEmployeesPanel;window.refreshMainDepartments=renderMainDepartments;
-  setTimeout(initNewUI,300);
+  setTimeout(async()=>{ await loadEmployees(); initNewUI(); },300);
 })();
