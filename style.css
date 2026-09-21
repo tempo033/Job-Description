@@ -47,14 +47,14 @@ html,body{min-height:100%;overflow-x:hidden}
 .app{min-height:100vh}
 .layout{position:relative;display:block;max-width:none;width:100%;margin:0;padding:0;min-height:calc(100vh - 82px)}
 .sidebar{position:fixed;right:0;top:82px;bottom:0;width:280px;height:calc(100vh - 82px);margin:0;border-radius:0;border-top:0;border-bottom:0;border-left:1px solid var(--line);border-right:0;overflow-y:auto;overscroll-behavior:contain;z-index:30}
-.content{width:calc(100% - 280px);min-height:calc(100vh - 82px);margin:0 0 0 280px;padding:28px 4vw 50px;overflow:visible}
+.content{width:calc(100% - 280px);min-height:calc(100vh - 82px);margin:0 280px 0 0;padding:28px 4vw 50px;overflow:visible}
 .view{width:100%;min-height:calc(100vh - 138px)}
 .view.hidden{display:none!important}
 .main-nav{min-height:48px}
 .subnav{max-height:calc(100vh - 250px);overflow-y:auto}
 @media(max-width:1050px){
   .sidebar{width:230px}
-  .content{width:calc(100% - 230px);margin-left:230px}
+  .content{width:calc(100% - 230px);margin-right:230px}
 }
 @media(max-width:760px){
   .layout{display:block;min-height:auto}
