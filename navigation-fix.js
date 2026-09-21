@@ -74,6 +74,12 @@
     });
 
     showMainView("jobs");
+    if(typeof window.loadEmployees==="function"){
+      Promise.resolve(window.loadEmployees()).then(function(){
+        if(typeof window.renderEmployeesPanel==="function") window.renderEmployeesPanel();
+        if(typeof window.renderEvaluationPanel==="function") window.renderEvaluationPanel();
+      });
+    }
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",wire);
