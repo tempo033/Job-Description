@@ -31,7 +31,8 @@
   </div>
   <div id="employeesView" class="view hidden">
     <div class="page-head"><div><span class="eyebrow">HR • EMPLOYEES</span><h2>قسم الموظفين</h2><p>إدارة الموظفين وربط كل موظف بالمسمى والوصف الوظيفي ومؤشرات الأداء.</p></div><button class="btn gold" id="addEmployeeBtn">+ إضافة موظف</button></div>
-    <div class="toolbar"><div class="search"><span>⌕</span><input id="employeeSearch" placeholder="ابحث باسم الموظف أو الرقم أو المسمى..."></div><select id="employeeDeptFilter"><option value="">كل الإدارات</option></select></div>
+    <div class="toolbar employee-toolbar"><div class="search"><span>⌕</span><input id="employeeSearch" placeholder="ابحث باسم الموظف أو الرقم أو المسمى..."></div><select id="employeeDeptFilter"><option value="">كل الإدارات</option></select><div class="bulk-actions"><button class="small-btn" id="selectAllEmployees">✓ تحديد الكل</button><button class="small-btn" id="clearEmployeeSelection">إلغاء التحديد</button><button class="small-btn danger" id="deleteSelectedEmployees">حذف المحدد</button><button class="small-btn danger strong" id="deleteAllEmployees">حذف الكل</button></div></div>
+    <div id="employeeSelectionInfo" class="selection-info">لم يتم تحديد أي موظف</div>
     <div id="employeesTable" class="employees-table"></div>
   </div>
   <div id="evaluationView" class="view hidden">
