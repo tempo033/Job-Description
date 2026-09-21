@@ -81,28 +81,39 @@ $("#importInput").addEventListener("change",e=>{const file=e.target.files[0];if(
 // ===== الموظفون + الاستيراد من Excel + التقييم الإلكتروني =====
 let employees=[];
 let kpiTemplates=[];
-function normalizeKey(v){return String(v||"").trim().toLowerCase().replace(/[\s_\-]+/g,"");}
+function normalizeKey(v){return String(v??"").trim().toLowerCase().replace(/[\u064B-\u065F\u0670]/g,"").replace(/[إأآٱ]/g,"ا").replace(/[ة]/g,"ه").replace(/[ى]/g,"ي").replace(/[\s_\-./\\()\[\]{}:؛،|]+/g,"");}
+function cleanText(v){return String(v??"").trim().replace(/\s+/g," ");}
 function employeeRow(row){
   const m={}; Object.keys(row||{}).forEach(k=>m[normalizeKey(k)]=row[k]);
-  const pick=(keys)=>{for(const k of keys){if(m[normalizeKey(k)]!==undefined&&m[normalizeKey(k)]!=="")return m[normalizeKey(k)];}return "";};
+  const pick=(keys)=>{for(const k of keys){const v=m[normalizeKey(k)];if(v!==undefined&&v!==null&&String(v).trim()!=="")return v;}return "";};
   return {
-    employee_no:String(pick(["رقم الموظف","الرقم الوظيفي","employee no","employee_no","id"])||"").trim(),
-    name:String(pick(["اسم الموظف","الاسم","name","employee name"])||"").trim(),
-    national_id:String(pick(["رقم الهوية","الهوية","رقم الاقامة","الإقامة","national id","national_id"])||"").trim(),
-    nationality:String(pick(["الجنسية","nationality"])||"").trim(),
-    department:String(pick(["القسم","الإدارة","department"])||"").trim(),
-    job_title:String(pick(["المسمى الوظيفي","الوظيفة","job title","job_title","المسمى"])||"").trim(),
-    manager:String(pick(["الرئيس المباشر","المدير المباشر","manager"])||"").trim(),
-    hire_date:String(pick(["تاريخ التعيين","تاريخ المباشرة","hire date","hire_date"])||"").trim()||null,
-    base_salary:Number(pick(["الراتب الأساسي","basic salary","base salary","base_salary"]))||null,
-    housing_allowance:Number(pick(["بدل السكن","housing allowance","housing_allowance"]))||null,
-    transport_allowance:Number(pick(["بدل النقل","transport allowance","transport_allowance"]))||null,
-    phone:String(pick(["رقم الجوال","الجوال","الهاتف","phone","mobile"])||"").trim(),
-    email:String(pick(["البريد الإلكتروني","البريد","email"])||"").trim(),
-    status:String(pick(["الحالة","status"])||"على رأس العمل").trim(),
+    employee_no:cleanText(pick(["رقم الموظف","الرقم الوظيفي","الرقم","كود الموظف","كود","employee no","employee number","employee id","employee_no","emp no","emp id"])),
+    name:cleanText(pick(["اسم الموظف","اسم","الاسم","اسم العامل","اسم الموظف بالكامل","employee name","full name","name"])),
+    national_id:cleanText(pick(["رقم الهوية","رقم الاقامة","رقم الإقامة","الهوية","الإقامة","رقم الاقامه","هوية","iqama","iqama no","iqama number","national id","national id number","national_id"])),
+    nationality:cleanText(pick(["الجنسية","جنسيه","nationality"])),
+    department:cleanText(pick(["القسم","الإدارة","الادارة","اسم الإدارة","اسم الادارة","القسم الإداري","الاداره","department","department name"])),
+    job_title:cleanText(pick(["المسمى الوظيفي","المسمى","المسمى الوظيفى","الوظيفة","الوظيفه","اسم الوظيفة","اسم الوظيفه","المنصب","الوظيفة الحالية","job title","jobtitle","position","position title","job_title"])),
+    manager:cleanText(pick(["الرئيس المباشر","المدير المباشر","اسم المدير","المدير","المسؤول المباشر","manager","direct manager","supervisor"])),
+    hire_date:cleanText(pick(["تاريخ التعيين","تاريخ المباشرة","تاريخ المباشره","تاريخ الالتحاق","تاريخ بدء العمل","hire date","hire_date","start date"]))||null,
+    base_salary:Number(pick(["الراتب الأساسي","الراتب الاساسي","الراتب","الراتب الشهري","basic salary","base salary","salary","base_salary"]))||null,
+    housing_allowance:Number(pick(["بدل السكن","بدل سكن","السكن","housing allowance","housing_allowance"]))||null,
+    transport_allowance:Number(pick(["بدل النقل","بدل مواصلات","النقل","transport allowance","transport_allowance"]))||null,
+    phone:cleanText(pick(["رقم الجوال","الجوال","رقم الهاتف","الهاتف","الموبايل","mobile","phone","telephone"])),
+    email:cleanText(pick(["البريد الإلكتروني","البريد الالكتروني","البريد","الايميل","الإيميل","email","e mail"])),
+    status:cleanText(pick(["الحالة","حالة الموظف","حاله الموظف","status"]))||"على رأس العمل",
     source_data:row||{},
     updated_at:new Date().toISOString()
   };
+}
+function normalizeMatch(v){return normalizeKey(v).replace(/المهندس|مهندس/g,"مهندس");}
+function findMatchingJob(row){
+  const title=normalizeMatch(row.job_title), dep=normalizeMatch(row.department);
+  if(!title) return null;
+  let j=(jobs||[]).find(x=>normalizeMatch(x.name)===title && (!dep||normalizeMatch(x.department)===dep));
+  if(!j) j=(jobs||[]).find(x=>normalizeMatch(x.name)===title);
+  if(!j) return null;
+  row.job_title=j.name; row.department=j.department; row.job_description_id=j.id;
+  return j;
 }
 async function importEmployeesFromExcel(file){
   if(!window.XLSX) throw new Error("مكتبة Excel لم تُحمّل.");
@@ -112,18 +123,22 @@ async function importEmployeesFromExcel(file){
   const rows=XLSX.utils.sheet_to_json(sheet,{defval:""});
   if(!rows.length) throw new Error("الملف لا يحتوي على بيانات.");
   const mapped=rows.map(employeeRow).filter(x=>x.name);
-  if(!mapped.length) throw new Error("لم يتم العثور على عمود اسم الموظف.");
+  if(!mapped.length) throw new Error("لم يتم العثور على عمود اسم الموظف. تأكد من وجود عمود باسم «اسم الموظف» أو «الاسم».");
+  mapped.forEach(findMatchingJob);
   const {data:existing,error}=await db.from("employees").select("*");
   if(error) throw error;
   const old=existing||[];
   for(const row of mapped){
     const match=old.find(e=>(row.employee_no&&e.employee_no===row.employee_no)||(row.national_id&&e.national_id===row.national_id)||(e.name===row.name&&row.job_title&&e.job_title===row.job_title));
-    if(match) await db.from("employees").update(row).eq("id",match.id);
-    else await db.from("employees").insert(row);
+    let result;
+    if(match) result=await db.from("employees").update(row).eq("id",match.id).select().single();
+    else result=await db.from("employees").insert(row).select().single();
+    if(result.error) throw result.error;
   }
   const refreshed=await db.from("employees").select("*");
   if(refreshed.error) throw refreshed.error;
   employees=refreshed.data||[];
+  renderEmployeesPanel();
   return mapped.length;
 }
 async function ensureKpis(job){
