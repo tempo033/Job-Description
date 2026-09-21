@@ -76,11 +76,10 @@
     showMainView("jobs");
     if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
     /* app.js loads الوظائف asynchronously؛ أعد رسم القائمة الجانبية فور وصول البيانات. */
-    (function refreshJobMenu(){
+    (function refreshJobMenu(attempt){
       if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
-      if(window.jobs && window.jobs.length) return;
-      setTimeout(refreshJobMenu,300);
-    })();
+      if(attempt < 12) setTimeout(function(){refreshJobMenu(attempt+1);},300);
+    })(0);
     if(typeof window.loadEmployees==="function"){
       Promise.resolve(window.loadEmployees()).then(function(){
         if(typeof window.renderEmployeesPanel==="function") window.renderEmployeesPanel();
