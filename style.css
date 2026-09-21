@@ -63,3 +63,20 @@ html,body{min-height:100%;overflow-x:hidden}
   .view{min-height:auto}
   .subnav{max-height:300px}
 }
+
+/* ===== تحديد وحذف مجموعات الموظفين ===== */
+.employee-toolbar{align-items:stretch;flex-wrap:wrap}
+.employee-toolbar .search{min-width:220px}
+.employee-toolbar select{min-width:150px}
+.bulk-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bulk-actions .small-btn{height:100%;white-space:nowrap}
+.small-btn.strong{font-weight:900;border-color:#c78c87;background:#f8e9e7}
+.selection-info{margin:-7px 0 12px;padding:8px 12px;border-radius:9px;background:#f4eee3;color:var(--muted);font-size:11px;font-weight:800}
+.selection-info.has-selection{background:#e9dfc8;color:var(--navy)}
+.employee-row{grid-template-columns:44px 1.2fr 1fr 1.4fr 1fr 180px}
+.employee-check,.employee-check-head{display:flex;align-items:center;justify-content:center}
+.employee-check input,.employee-check-head input{width:17px;height:17px;margin:0;accent-color:var(--navy);cursor:pointer}
+.employee-check-head{gap:5px;font-size:10px}
+.employee-row.selected{background:#fbf6ea}
+@media(max-width:1000px){.employee-toolbar .search{flex:1 1 100%}.employee-toolbar select{flex:1}.bulk-actions{flex:1}.bulk-actions .small-btn{flex:1}}
+@media(max-width:760px){.bulk-actions{width:100%}.bulk-actions .small-btn{flex:1}.employee-row{grid-template-columns:44px 1.2fr 1fr 1.4fr 1fr 180px}}
