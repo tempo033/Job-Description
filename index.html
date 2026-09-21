@@ -16,11 +16,11 @@
 <main class="layout">
 <aside class="sidebar">
   <div class="nav-title">التنقل الرئيسي</div>
-  <button class="main-nav active" data-view="jobs" id="jobNav"><span>▦</span><b>الوصف الوظيفي</b><i>⌄</i></button>
+  <button type="button" class="main-nav active" data-view="jobs" id="jobNav"><span>▦</span><b>الوصف الوظيفي</b><i>⌄</i></button>
   <div id="jobDepartments" class="subnav"></div>
   <div id="departments" style="display:none"></div><button id="allDeptBtn" style="display:none"></button>
-  <button class="main-nav" data-view="employees"><span>♙</span><b>الموظفين</b><i></i></button>
-  <button class="main-nav" data-view="evaluation"><span>✓</span><b>التقييم الإلكتروني KPI</b><i></i></button>
+  <button type="button" class="main-nav" data-view="employees"><span>♙</span><b>الموظفين</b><i></i></button>
+  <button type="button" class="main-nav" data-view="evaluation"><span>✓</span><b>التقييم الإلكتروني KPI</b><i></i></button>
   <div class="note"><b>مكتبة داخلية</b><br>الأوصاف مخصصة للوظائف الحالية داخل الشركة وليست لإعلانات التوظيف.</div>
 </aside>
 <section class="content">
@@ -31,7 +31,7 @@
   </div>
   <div id="employeesView" class="view hidden">
     <div class="page-head"><div><span class="eyebrow">HR • EMPLOYEES</span><h2>قسم الموظفين</h2><p>إدارة الموظفين وربط كل موظف بالمسمى والوصف الوظيفي ومؤشرات الأداء.</p></div><button class="btn gold" id="addEmployeeBtn">+ إضافة موظف</button></div>
-    <div class="toolbar employee-toolbar"><div class="search"><span>⌕</span><input id="employeeSearch" placeholder="ابحث باسم الموظف أو الرقم أو المسمى..."></div><select id="employeeDeptFilter"><option value="">كل الإدارات</option></select><div class="bulk-actions"><button class="small-btn" id="selectAllEmployees">✓ تحديد الكل</button><button class="small-btn" id="clearEmployeeSelection">إلغاء التحديد</button><button class="small-btn danger" id="deleteSelectedEmployees">حذف المحدد</button><button class="small-btn danger strong" id="deleteAllEmployees">حذف الكل</button></div></div>
+    <div class="toolbar employee-toolbar"><div class="search"><span>⌕</span><input id="employeeSearch" placeholder="ابحث باسم الموظف أو الرقم أو المسمى..."></div><select id="employeeDeptFilter"><option value="">كل الإدارات</option></select><div class="bulk-actions"><button type="button" class="small-btn" id="selectAllEmployees">✓ تحديد الكل</button><button type="button" class="small-btn" id="clearEmployeeSelection">إلغاء التحديد</button><button type="button" class="small-btn danger" id="deleteSelectedEmployees">حذف المحدد</button><button type="button" class="small-btn danger strong" id="deleteAllEmployees">حذف الكل</button></div></div>
     <div id="employeeSelectionInfo" class="selection-info">لم يتم تحديد أي موظف</div>
     <div id="employeesTable" class="employees-table"></div>
   </div>
