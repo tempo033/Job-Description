@@ -39,11 +39,12 @@ function makeJob({name,department}){
  : arr("تنفيذ الأعمال اليومية والدورية المرتبطة بالوظيفة.","متابعة الطلبات والمعاملات ضمن نطاق القسم.","التنسيق مع الأطراف والإدارات ذات العلاقة.","تحديث السجلات والبيانات والتقارير.","رفع الملاحظات والمخاطر والمعوقات للمسؤول المباشر.");
  const routine=arr("مراجعة الأعمال المفتوحة والأولويات.","متابعة الطلبات والمعاملات المستحقة.","تحديث السجلات والبيانات.","التنسيق مع المسؤول المباشر والجهات ذات العلاقة.");
  const authorities=arr("تنفيذ المهام ضمن الصلاحيات المعتمدة.","طلب البيانات والمستندات اللازمة لإنجاز العمل.","رفع الحالات الاستثنائية أو المخالفات للمسؤول المباشر.","اقتراح التحسينات المتعلقة بمجال العمل.");
- const qualifications=arr("مؤهل علمي مناسب لطبيعة الوظيفة.","خبرة عملية مناسبة لمستوى الوظيفة ومسؤولياتها.");
+ const qualifications=arr("مؤهل علمي مناسب لطبيعة الوظيفة.","دورات مهنية مرتبطة بطبيعة العمل حسب الحاجة.");
+ const experience=arr("خبرة عملية مناسبة لمستوى الوظيفة ومسؤولياتها.","خبرة في بيئة عمل ومشاريع مشابهة لطبيعة الوظيفة.");
  const skills=arr("التنظيم وإدارة الوقت.","الدقة والمتابعة.","التواصل والعمل الجماعي.","إجادة استخدام الحاسب والبرامج المرتبطة بالوظيفة.");
  const kpi=arr("نسبة إنجاز المهام في المواعيد المحددة.","دقة واكتمال السجلات والمستندات.","نسبة إغلاق الملاحظات والمعاملات المفتوحة.","الالتزام بالإجراءات والتعليمات.");
  const compliance=arr("الالتزام بسياسات الشركة واللوائح والتعليمات الداخلية.","المحافظة على سرية معلومات العمل والمستندات.","الالتزام بساعات العمل ومتطلبات الانضباط.","عدم تجاوز الصلاحيات المعتمدة.");
- return {name,department,manager,purpose,responsibilities,routine,authorities,qualifications,skills,kpi,compliance,updated_at:new Date().toISOString()};
+ return {name,department,manager,purpose,responsibilities,routine,authorities,qualifications,experience,skills,kpi,compliance,updated_at:new Date().toISOString()};
 }
 const seed=roles.map(makeJob);
 const $=s=>document.querySelector(s);
@@ -67,14 +68,118 @@ function renderDepts(){const ds=departments();$("#deptCount").textContent=ds.len
 function render(){renderDepts();const q=$("#search").value.trim().toLowerCase();let list=jobs.filter(j=>(activeDept==="الكل"||j.department===activeDept)&&[j.name,j.department,j.manager,j.purpose].join(" ").toLowerCase().includes(q));list.sort((a,b)=>$("#sort").value==="dept"?a.department.localeCompare(b.department,"ar")||a.name.localeCompare(b.name,"ar"):a.name.localeCompare(b.name,"ar"));$("#jobs").innerHTML=list.map(card).join("");$("#empty").classList.toggle("hidden",list.length>0)}
 function card(j){return'<article class="job-card"><span class="tag">'+esc(j.department)+'</span><h3>'+esc(j.name)+'</h3><div class="manager">الرئيس المباشر: '+esc(j.manager||"—")+'</div><p class="purpose">'+esc(j.purpose||"لا يوجد وصف مختصر.")+'</p><div class="card-bottom"><button class="open" data-open="'+j.id+'">فتح الوصف</button><button class="edit-link" data-edit="'+j.id+'">تعديل</button></div></article>'}
 function section(title,value,full=false,printHidden=false,printInclude=false){const ls=lines(value);return'<div class="section '+(full?"full ":"")+(printHidden?"print-hidden ":"")+(printInclude?"print-include":"")+'"><h3>'+title+'</h3>'+(ls.length?'<ul>'+ls.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':'<p>لا توجد بيانات مضافة.</p>')+'</div>'}
-function showDetail(id){const j=jobs.find(x=>x.id===id);if(!j)return;currentId=id;window.currentId=id;$("#detail").innerHTML='<div class="print-header"><div class="print-company">شركة البنية الأساسية</div><div class="print-subcompany">إدارة الموارد البشرية</div><div class="print-doc">الوصف الوظيفي</div><div class="print-meta"><span>القسم: '+esc(j.department)+'</span><span>رقم الوثيقة: JD-'+esc(String(j.id||"").slice(0,8).toUpperCase())+'</span></div></div><div class="detail-top"><span class="tag">'+esc(j.department)+'</span><h2>'+esc(j.name)+'</h2><p>الرئيس المباشر: '+esc(j.manager||"—")+' • آخر تحديث: '+esc((j.updated_at||"").slice(0,10)||"—")+'</p><div class="detail-actions"><button class="btn gold" onclick="window.print()">طباعة / حفظ PDF</button><button class="btn ghost" style="color:var(--navy)" onclick="editJob(currentId)">تعديل</button><button class="btn ghost" style="color:var(--danger)" onclick="deleteJob(currentId)">حذف</button></div></div><div class="detail-grid"><div class="section full print-include"><h3>الهدف العام من الوظيفة</h3><p>'+esc(j.purpose||"لا يوجد")+'</p></div>'+section("المهام والمسؤوليات الرئيسية",j.responsibilities,true,false,true)+section("المهام اليومية / الدورية",j.routine,false,true)+section("الصلاحيات والمسؤوليات",j.authorities,false,false,true)+section("المؤهلات",j.qualifications,false,true)+section("الخبرات والمهارات",j.skills,false,true)+section("مؤشرات الأداء KPI",j.kpi,false,true)+section("متطلبات الالتزام والانضباط",j.compliance,true,true)+'</div>';$("#detailModal").classList.remove("hidden")}
-function editJob(id){const j=jobs.find(x=>x.id===id);if(!j)return;$("#jobId").value=j.id;$("#fName").value=j.name;$("#fDept").value=j.department;$("#fManager").value=j.manager||"";$("#fDate").value=(j.updated_at||today).slice(0,10);$("#fPurpose").value=j.purpose||"";$("#fResponsibilities").value=lines(j.responsibilities).join("\n");$("#fRoutine").value=lines(j.routine).join("\n");$("#fAuthorities").value=lines(j.authorities).join("\n");$("#fQualifications").value=lines(j.qualifications).join("\n");$("#fSkills").value=lines(j.skills).join("\n");$("#fKpi").value=lines(j.kpi).join("\n");$("#fCompliance").value=lines(j.compliance).join("\n");$("#formTitle").textContent="تعديل الوصف الوظيفي";$("#detailModal").classList.add("hidden");$("#formModal").classList.remove("hidden")}
+function showDetail(id){const j=jobs.find(x=>x.id===id);if(!j)return;currentId=id;window.currentId=id;$("#detail").innerHTML='<div class="print-header"><div class="print-company">شركة البنية الأساسية</div><div class="print-subcompany">إدارة الموارد البشرية</div><div class="print-doc">الوصف الوظيفي</div><div class="print-meta"><span>القسم: '+esc(j.department)+'</span><span>رقم الوثيقة: JD-'+esc(String(j.id||"").slice(0,8).toUpperCase())+'</span></div></div><div class="detail-top"><span class="tag">'+esc(j.department)+'</span><h2>'+esc(j.name)+'</h2><p>الرئيس المباشر: '+esc(j.manager||"—")+' • آخر تحديث: '+esc((j.updated_at||"").slice(0,10)||"—")+'</p><div class="detail-actions"><button class="btn gold" onclick="window.print()">طباعة / حفظ PDF</button><button class="btn ghost" style="color:var(--navy)" onclick="editJob(currentId)">تعديل</button><button class="btn ghost" style="color:var(--danger)" onclick="deleteJob(currentId)">حذف</button></div></div><div class="detail-grid"><div class="section full print-include"><h3>الهدف العام من الوظيفة</h3><p>'+esc(j.purpose||"لا يوجد")+'</p></div>'+section("المهام والمسؤوليات الرئيسية",j.responsibilities,true,false,true)+section("المهام اليومية / الدورية",j.routine,false,true)+section("الصلاحيات والمسؤوليات",j.authorities,false,false,true)+section("المؤهلات",j.qualifications,false,true)+section("الخبرات",j.experience,false,true)+section("المهارات",j.skills,false,true)+section("مؤشرات الأداء KPI",j.kpi,false,true)+section("متطلبات الالتزام والانضباط",j.compliance,true,true)+'</div>';$("#detailModal").classList.remove("hidden")}
+function editJob(id){const j=jobs.find(x=>x.id===id);if(!j)return;$("#jobId").value=j.id;$("#fName").value=j.name;$("#fDept").value=j.department;$("#fManager").value=j.manager||"";$("#fDate").value=(j.updated_at||today).slice(0,10);$("#fPurpose").value=j.purpose||"";$("#fResponsibilities").value=lines(j.responsibilities).join("\n");$("#fRoutine").value=lines(j.routine).join("\n");$("#fAuthorities").value=lines(j.authorities).join("\n");$("#fQualifications").value=lines(j.qualifications).join("\n");$("#fExperience").value=lines(j.experience).join("\n");$("#fSkills").value=lines(j.skills).join("\n");$("#fKpi").value=lines(j.kpi).join("\n");$("#fCompliance").value=lines(j.compliance).join("\n");$("#formTitle").textContent="تعديل الوصف الوظيفي";$("#detailModal").classList.add("hidden");$("#formModal").classList.remove("hidden")}
 async function deleteJob(id){const j=jobs.find(x=>x.id===id);if(!j)return;if(!confirm("هل أنت متأكد من حذف وصف وظيفة «"+j.name+"»؟"))return;const {error}=await db.from("job_descriptions").delete().eq("id",id);if(error){alert("تعذر حذف الوظيفة.");return}jobs=jobs.filter(x=>x.id!==id);$("#detailModal").classList.add("hidden");render()}
 function addJob(){$("#jobForm").reset();$("#jobId").value="";$("#fDate").value=today;$("#formTitle").textContent="إضافة وصف وظيفي";$("#formModal").classList.remove("hidden")}
 document.addEventListener("click",e=>{const close=e.target.closest("[data-close]");if(close){const modalId=close.getAttribute("data-close");const modal=document.getElementById(modalId);if(modal)modal.classList.add("hidden");return}const d=e.target.closest("[data-dept]");if(d){activeDept=d.dataset.dept;render();return}if(e.target.id==="allDeptBtn"){activeDept="الكل";render();return}const o=e.target.closest("[data-open]");if(o)showDetail(o.dataset.open);const ed=e.target.closest("[data-edit]");if(ed)editJob(ed.dataset.edit);});
 $("#search").addEventListener("input",render);$("#sort").addEventListener("change",render);$("#addBtn").addEventListener("click",addJob);
-$("#jobForm").addEventListener("submit",async e=>{e.preventDefault();const id=$("#jobId").value;const payload={name:$("#fName").value.trim(),department:$("#fDept").value.trim(),manager:$("#fManager").value.trim(),purpose:$("#fPurpose").value.trim(),responsibilities:lines($("#fResponsibilities").value),routine:lines($("#fRoutine").value),authorities:lines($("#fAuthorities").value),qualifications:lines($("#fQualifications").value),skills:lines($("#fSkills").value),kpi:lines($("#fKpi").value),compliance:lines($("#fCompliance").value),updated_at:new Date().toISOString()};let result;if(id)result=await db.from("job_descriptions").update(payload).eq("id",id).select().single();else result=await db.from("job_descriptions").insert(payload).select().single();if(result.error){alert("تعذر حفظ التعديل في قاعدة البيانات.");console.error(result.error);return}if(id){jobs=jobs.map(j=>j.id===id?result.data:j)}else jobs.push(result.data);$("#formModal").classList.add("hidden");render()});
+$("#jobForm").addEventListener("submit",async e=>{e.preventDefault();const id=$("#jobId").value;const payload={name:$("#fName").value.trim(),department:$("#fDept").value.trim(),manager:$("#fManager").value.trim(),purpose:$("#fPurpose").value.trim(),responsibilities:lines($("#fResponsibilities").value),routine:lines($("#fRoutine").value),authorities:lines($("#fAuthorities").value),qualifications:lines($("#fQualifications").value),experience:lines($("#fExperience").value),skills:lines($("#fSkills").value),kpi:lines($("#fKpi").value),compliance:lines($("#fCompliance").value),updated_at:new Date().toISOString()};let result;if(id)result=await db.from("job_descriptions").update(payload).eq("id",id).select().single();else result=await db.from("job_descriptions").insert(payload).select().single();if(result.error){alert("تعذر حفظ التعديل في قاعدة البيانات.");console.error(result.error);return}if(id){jobs=jobs.map(j=>j.id===id?result.data:j)}else jobs.push(result.data);$("#formModal").classList.add("hidden");render()});
 $("#exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(jobs,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="job-description-library.json";a.click();URL.revokeObjectURL(a.href)});
 $("#importInput").addEventListener("change",e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=async()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x))throw 0;const rows=x.map(j=>({...j,id:j.id||crypto.randomUUID()}));const {data,error}=await db.from("job_descriptions").upsert(rows).select();if(error)throw error;jobs=data;render();alert("تم استيراد البيانات وحفظها في Supabase.")}catch(err){console.error(err);alert("ملف البيانات غير صالح أو تعذر حفظه.")}};r.readAsText(file)});
+
+// ===== الموظفون + الاستيراد من Excel + التقييم الإلكتروني =====
+let employees=[];
+let kpiTemplates=[];
+function normalizeKey(v){return String(v||"").trim().toLowerCase().replace(/[\s_\-]+/g,"");}
+function employeeRow(row){
+  const m={}; Object.keys(row||{}).forEach(k=>m[normalizeKey(k)]=row[k]);
+  const pick=(keys)=>{for(const k of keys){if(m[normalizeKey(k)]!==undefined&&m[normalizeKey(k)]!=="")return m[normalizeKey(k)];}return "";};
+  return {
+    employee_no:String(pick(["رقم الموظف","الرقم الوظيفي","employee no","employee_no","id"])||"").trim(),
+    name:String(pick(["اسم الموظف","الاسم","name","employee name"])||"").trim(),
+    national_id:String(pick(["رقم الهوية","الهوية","رقم الاقامة","الإقامة","national id","national_id"])||"").trim(),
+    nationality:String(pick(["الجنسية","nationality"])||"").trim(),
+    department:String(pick(["القسم","الإدارة","department"])||"").trim(),
+    job_title:String(pick(["المسمى الوظيفي","الوظيفة","job title","job_title","المسمى"])||"").trim(),
+    manager:String(pick(["الرئيس المباشر","المدير المباشر","manager"])||"").trim(),
+    hire_date:String(pick(["تاريخ التعيين","تاريخ المباشرة","hire date","hire_date"])||"").trim()||null,
+    base_salary:Number(pick(["الراتب الأساسي","basic salary","base salary","base_salary"]))||null,
+    housing_allowance:Number(pick(["بدل السكن","housing allowance","housing_allowance"]))||null,
+    transport_allowance:Number(pick(["بدل النقل","transport allowance","transport_allowance"]))||null,
+    phone:String(pick(["رقم الجوال","الجوال","الهاتف","phone","mobile"])||"").trim(),
+    email:String(pick(["البريد الإلكتروني","البريد","email"])||"").trim(),
+    status:String(pick(["الحالة","status"])||"على رأس العمل").trim(),
+    source_data:row||{},
+    updated_at:new Date().toISOString()
+  };
+}
+async function importEmployeesFromExcel(file){
+  if(!window.XLSX) throw new Error("مكتبة Excel لم تُحمّل.");
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:"array",cellDates:true});
+  const sheet=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(sheet,{defval:""});
+  if(!rows.length) throw new Error("الملف لا يحتوي على بيانات.");
+  const mapped=rows.map(employeeRow).filter(x=>x.name);
+  if(!mapped.length) throw new Error("لم يتم العثور على عمود اسم الموظف.");
+  const {data:existing,error}=await db.from("employees").select("*");
+  if(error) throw error;
+  const old=existing||[];
+  for(const row of mapped){
+    const match=old.find(e=>(row.employee_no&&e.employee_no===row.employee_no)||(row.national_id&&e.national_id===row.national_id)||(e.name===row.name&&row.job_title&&e.job_title===row.job_title));
+    if(match) await db.from("employees").update(row).eq("id",match.id);
+    else await db.from("employees").insert(row);
+  }
+  const refreshed=await db.from("employees").select("*");
+  if(refreshed.error) throw refreshed.error;
+  employees=refreshed.data||[];
+  return mapped.length;
+}
+async function ensureKpis(job){
+  const got=await db.from("job_kpi_templates").select("*").eq("job_description_id",job.id);
+  if(got.error) throw got.error;
+  if((got.data||[]).length) return got.data;
+  const tasks=lines(job.responsibilities).slice(0,6);
+  const rows=tasks.map((task,i)=>({
+    job_description_id:job.id,
+    indicator_name:"مؤشر أداء "+(i+1),
+    question:"إلى أي مدى ينجز الموظف المهمة التالية بجودة وفي الوقت المحدد: "+task,
+    category:"إنجاز وجودة العمل",
+    weight:Number((100/Math.max(tasks.length,1)).toFixed(2)),
+    answer_type:"scale_1_5",
+    active:true
+  }));
+  if(!rows.length) return [];
+  const ins=await db.from("job_kpi_templates").insert(rows).select();
+  if(ins.error) throw ins.error;
+  return ins.data||[];
+}
+function performanceLevel(score){
+  if(score>=90)return"متميز";
+  if(score>=80)return"جيد جدًا";
+  if(score>=70)return"جيد";
+  if(score>=60)return"يحتاج إلى تحسين";
+  return"يحتاج إلى خطة تطوير";
+}
+async function openEvaluation(){
+  const er=await db.from("employees").select("*");
+  if(er.error){alert("تعذر تحميل قاعدة بيانات الموظفين.");return}
+  employees=er.data||[];
+  if(!employees.length){alert("لا توجد بيانات موظفين. استخدم زر «استيراد Excel للموظفين» أولًا.");return}
+  const options=employees.map(e=>'<option value="'+esc(e.id)+'">'+esc(e.name)+' — '+esc(e.job_title||"بدون مسمى")+'</option>').join("");
+  const html='<div class="eval-overlay" id="evalOverlay"><div class="eval-card"><button class="close" id="evalClose">×</button><div class="form-head"><span class="eyebrow">تقييم الأداء الإلكتروني</span><h2>تقييم موظف</h2></div><label>الموظف<select id="evalEmployee">'+options+'</select></label><div id="evalQuestions" class="eval-questions"></div><div id="evalResult" class="eval-result hidden"></div><div class="form-actions"><button class="btn ghost" id="evalCancel">إلغاء</button><button class="btn gold" id="calcEval">حساب التقييم</button></div></div></div>';
+  document.body.insertAdjacentHTML("beforeend",html);
+  const loadQuestions=async()=>{const emp=employees.find(x=>x.id===$("#evalEmployee").value);const job=jobs.find(j=>j.name===emp?.job_title)||jobs.find(j=>j.department===emp?.department&&j.name===emp?.job_title);const box=$("#evalQuestions");if(!job){box.innerHTML='<div class="empty">لا يوجد وصف وظيفي مطابق للمسمى الوظيفي للموظف. راجع المسمى في ملف Excel.</div>';return}const qs=await ensureKpis(job);box.innerHTML=qs.map((q,i)=>'<div class="eval-q" data-kpi="'+q.id+'"><b>'+esc(q.indicator_name)+'</b><p>'+esc(q.question)+'</p><div class="scale">'+[1,2,3,4,5].map(n=>'<label><input type="radio" name="q'+i+'" value="'+n+'" '+(n===3?"checked":"")+'><span>'+n+'</span></label>').join("")+'</div></div>').join("");box.dataset.job=job.id};
+  $("#evalEmployee").addEventListener("change",loadQuestions); await loadQuestions();
+  $("#evalClose").onclick=$("#evalCancel").onclick=()=>$("#evalOverlay")?.remove();
+  $("#calcEval").onclick=async()=>{
+    const emp=employees.find(x=>x.id===$("#evalEmployee").value);const job=jobs.find(j=>j.id===$("#evalQuestions").dataset.job);if(!emp||!job)return;
+    const qs=await ensureKpis(job);let total=0;const answers=[];
+    qs.forEach((q,i)=>{const a=Number(document.querySelector('input[name="q'+i+'"]:checked')?.value||0);const score=a*20;const weighted=score*(Number(q.weight||0)/100);total+=weighted;answers.push({kpi_id:q.id,answer:a,score,weighted_score:weighted});});
+    total=Number(total.toFixed(2));const level=performanceLevel(total);
+    const strengths=qs.filter((q,i)=>answers[i].score>=80).map(q=>q.indicator_name).join("، ")||"لا توجد مؤشرات مرتفعة في هذه الدورة.";
+    const improvements=qs.filter((q,i)=>answers[i].score<70).map(q=>q.indicator_name).join("، ")||"لا توجد مؤشرات تحتاج تحسينًا وفق الإجابات.";
+    const recommendations=total>=80?"المحافظة على مستوى الأداء وتوسيع نطاق المسؤوليات تدريجيًا.":total>=70?"متابعة نقاط التحسين ورفع مستوى الاتساق في الأداء.":"إعداد خطة تطوير ومتابعة دورية للمؤشرات الأقل نتيجة.";
+    const saved=await db.from("employee_evaluations").insert({employee_id:emp.id,job_description_id:job.id,evaluator_name:"الموارد البشرية",total_score:total,performance_level:level,strengths,improvements,recommendations}).select().single();
+    if(saved.error){alert("تعذر حفظ التقييم.");return}
+    const evId=saved.data.id;const ar=answers.map(a=>({...a,evaluation_id:evId}));const ins=await db.from("employee_evaluation_answers").insert(ar);
+    if(ins.error){alert("تم حفظ التقييم الأساسي لكن تعذر حفظ تفاصيل الإجابات.");return}
+    $("#evalResult").classList.remove("hidden");$("#evalResult").innerHTML='<h3>نتيجة التقييم</h3><div class="eval-score">'+total+'%</div><p><b>المستوى:</b> '+esc(level)+'</p><p><b>نقاط القوة:</b> '+esc(strengths)+'</p><p><b>نقاط التحسين:</b> '+esc(improvements)+'</p><p><b>التوصية:</b> '+esc(recommendations)+'</p>';
+  };
+}
+$("#evaluateBtn").addEventListener("click",openEvaluation);
+$("#employeeExcelInput").addEventListener("change",async e=>{const file=e.target.files[0];if(!file)return;try{const n=await importEmployeesFromExcel(file);alert("تم استيراد وتحديث "+n+" موظف وحفظ البيانات في قاعدة البيانات.");}catch(err){console.error(err);alert("تعذر استيراد ملف Excel: "+(err.message||"تأكد من عناوين الأعمدة."));}e.target.value="";});
+
 window.editJob=editJob;window.deleteJob=deleteJob;window.currentId=null;
 loadJobs();
