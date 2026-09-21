@@ -171,6 +171,33 @@ async function loadEmployees(){
   const r=await db.from("employees").select("*");
   if(r.error){console.error("تعذر تحميل الموظفين:",r.error);return false}
   employees=r.data||[];
+  /* إذا كان جدول الموظفين الحالي فارغًا، اعرض ملفات الموظفين الموجودة أصلًا في employee_records
+     كبيانات قراءة فقط، حتى لا تختفي الملفات القديمة من النظام. */
+  if(!employees.length){
+    const legacy=await db.from("employee_records").select("*");
+    if(!legacy.error && (legacy.data||[]).length){
+      employees=(legacy.data||[]).map(e=>({
+        id:e.id,
+        employee_no:e.employee_number,
+        name:e.full_name,
+        national_id:e.national_id,
+        nationality:e.nationality,
+        department:e.department,
+        job_title:e.job_title,
+        manager:e.manager_name,
+        hire_date:e.hire_date,
+        base_salary:e.basic_salary,
+        housing_allowance:e.housing_allowance,
+        transport_allowance:e.transportation_allowance,
+        phone:e.phone,
+        email:e.email,
+        status:e.employment_status||"على رأس العمل",
+        source_data:e,
+        job_description_id:null,
+        _legacyRecord:true
+      }));
+    }
+  }
   return true;
 }
 async function openEvaluation(){
