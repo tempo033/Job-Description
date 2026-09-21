@@ -10,13 +10,13 @@
 <body>
 <div class="app">
 <header class="topbar">
-<div class="brand"><div class="brand-mark">HR</div><div><h1>مكتبة الأوصاف الوظيفية</h1><p>مرجع داخلي للموظفين والإدارة والموارد البشرية</p></div></div>
+<div class="brand"><div class="brand-mark">HR</div><div><h1>مكتبة الأوصاف الوظيفية</h1><p>مرجع داخلي للموظفين والإدارة والموارد البشرية • 118 وظيفة / 15 قسمًا</p></div></div>
 <div class="top-actions"><button class="btn ghost" id="exportBtn">تصدير البيانات</button><label class="btn ghost import-label">استيراد البيانات<input id="importInput" type="file" accept=".json"></label><button class="btn gold" id="addBtn">+ إضافة وظيفة</button></div>
 </header>
 <main class="layout">
-<aside class="sidebar"><div class="side-head"><h2>الأقسام</h2><button id="allDeptBtn" class="mini active">الكل</button></div><div id="departments"></div><div class="note"><b>ملاحظة</b><br>هذه المكتبة مخصصة لوصف الوظائف الحالية داخل الشركة، وليست لإعلانات التوظيف.</div></aside>
+<aside class="sidebar"><div class="side-head"><h2>الأقسام</h2><button id="allDeptBtn" class="mini active">الكل</button></div><div id="departments"></div><div class="note"><b>مكتبة داخلية</b><br>الأوصاف مخصصة للوظائف الحالية داخل الشركة وليست لإعلانات التوظيف.</div></aside>
 <section class="content">
-<div class="hero"><div><span class="eyebrow">HR • JOB DESCRIPTION</span><h2>الوصف الوظيفي داخل الشركة</h2><p>ابحث عن الوظيفة، راجع مسؤولياتها ومؤشرات الأداء، ثم اطبع الوصف أو احفظه بصيغة PDF.</p></div><div class="stats"><div><strong id="jobCount">0</strong><span>وظيفة</span></div><div><strong id="deptCount">0</strong><span>قسم</span></div></div></div>
+<div class="hero"><div><span class="eyebrow">HR • JOB DESCRIPTION</span><h2>مكتبة الوصف الوظيفي</h2><p>ابحث عن الوظيفة، راجع مسؤولياتها ومؤشرات الأداء، ثم اطبع الوصف أو احفظه بصيغة PDF. التعديلات تُحفظ مركزيًا على Supabase.</p></div><div class="stats"><div><strong id="jobCount">0</strong><span>وظيفة</span></div><div><strong id="deptCount">0</strong><span>قسم</span></div></div></div>
 <div class="toolbar"><div class="search"><span>⌕</span><input id="search" placeholder="ابحث باسم الوظيفة أو القسم أو المسؤول المباشر..."></div><select id="sort"><option value="name">ترتيب: اسم الوظيفة</option><option value="dept">ترتيب: القسم</option></select></div>
 <div id="jobs" class="jobs"></div><div id="empty" class="empty hidden">لا توجد وظائف مطابقة للبحث الحالي.</div>
 </section></main></div>
@@ -28,8 +28,9 @@
 <label>المهام والمسؤوليات الرئيسية<textarea id="fResponsibilities" rows="6"></textarea><small>اكتب كل مهمة في سطر مستقل.</small></label>
 <label>المهام اليومية / الدورية<textarea id="fRoutine" rows="4"></textarea></label><label>الصلاحيات والمسؤوليات<textarea id="fAuthorities" rows="4"></textarea></label>
 <div class="form-grid"><label>المؤهلات<textarea id="fQualifications" rows="4"></textarea></label><label>الخبرات والمهارات<textarea id="fSkills" rows="4"></textarea></label></div>
-<label>مؤشرات الأداء KPI<textarea id="fKpi" rows="5"></textarea><small>يمكن كتابة المؤشرات كنقاط، كل مؤشر في سطر.</small></label>
+<label>مؤشرات الأداء KPI<textarea id="fKpi" rows="5"></textarea><small>كل مؤشر في سطر مستقل.</small></label>
 <label>متطلبات الالتزام والانضباط<textarea id="fCompliance" rows="4"></textarea></label>
-<div class="form-actions"><button type="button" class="btn ghost" data-close="formModal">إلغاء</button><button class="btn gold" type="submit">حفظ الوصف الوظيفي</button></div></form></div></div>
+<div class="form-actions"><button type="button" class="btn ghost" data-close="formModal">إلغاء</button><button class="btn gold" type="submit">حفظ في قاعدة البيانات</button></div></form></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 </body></html>
