@@ -328,7 +328,7 @@ loadJobs();
 
   function populateEmployeeForm(id){
     const e=(employees||[]).find(x=>x.id===id)||{};
-    q("#employeeId").value=e.id||"";
+    q("#employeeId").value=e._legacyRecord?"":(e.id||"");
     q("#employeeFormTitle").textContent=id?"تعديل وإسناد المسمى الوظيفي":"إضافة موظف";
     q("#eNo").value=e.employee_no||"";q("#eName").value=e.name||"";q("#eNationalId").value=e.national_id||"";q("#eNationality").value=e.nationality||"";
     q("#eManager").value=e.manager||"";q("#eHireDate").value=e.hire_date||"";q("#eBaseSalary").value=e.base_salary??"";q("#eHousing").value=e.housing_allowance??"";q("#eTransport").value=e.transport_allowance??"";q("#eStatus").value=e.status||"على رأس العمل";q("#ePhone").value=e.phone||"";q("#eEmail").value=e.email||"";
