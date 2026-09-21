@@ -14,13 +14,33 @@
 <div class="top-actions"><button class="btn ghost" id="exportBtn">تصدير البيانات</button><label class="btn ghost import-label">استيراد Excel للموظفين<input id="employeeExcelInput" type="file" accept=".xlsx,.xls,.csv"></label><button class="btn ghost" id="evaluateBtn">تقييم موظف</button><label class="btn ghost import-label">استيراد JSON<input id="importInput" type="file" accept=".json"></label><button class="btn gold" id="addBtn">+ إضافة وظيفة</button></div>
 </header>
 <main class="layout">
-<aside class="sidebar"><div class="nav-title">التنقل الرئيسي</div><button class="main-nav active" data-view="jobs" id="jobNav"><span>▦</span><b>الوصف الوظيفي</b><i>⌄</i></button><div id="jobDepartments" class="subnav"></div><div id="departments" style="display:none"></div><button id="allDeptBtn" style="display:none"></button><button class="main-nav" data-view="employees"><span>♙</span><b>الموظفين</b><i></i></button><button class="main-nav" data-view="evaluation"><span>✓</span><b>التقييم الإلكتروني KPI</b><i></i></button><div class="note"><b>مكتبة داخلية</b><br>الأوصاف مخصصة للوظائف الحالية داخل الشركة وليست لإعلانات التوظيف.</div></aside>
-<section class="content"><div id="jobsView" class="view">
-<div class="hero"><div><span class="eyebrow">HR • JOB DESCRIPTION</span><h2>مكتبة الوصف الوظيفي</h2><p>ابحث عن الوظيفة، راجع مسؤولياتها ومؤشرات الأداء، ثم اطبع الوصف أو احفظه بصيغة PDF. التعديلات تُحفظ مركزيًا على Supabase.</p></div><div class="stats"><div><strong id="jobCount">0</strong><span>وظيفة</span></div><div><strong id="deptCount">0</strong><span>قسم</span></div></div></div>
-<div class="toolbar"><div class="search"><span>⌕</span><input id="search" placeholder="ابحث باسم الوظيفة أو القسم أو المسؤول المباشر..."></div><select id="sort"><option value="name">ترتيب: اسم الوظيفة</option><option value="dept">ترتيب: القسم</option></select></div>
-<div id="jobs" class="jobs"></div><div id="empty" class="empty hidden">لا توجد وظائف مطابقة للبحث الحالي.</div>
-</section></main></div>
-</div><div id="employeesView" class="view hidden"><div class="page-head"><div><span class="eyebrow">HR • EMPLOYEES</span><h2>قسم الموظفين</h2><p>إدارة الموظفين وربط كل موظف بالمسمى والوصف الوظيفي ومؤشرات الأداء.</p></div><button class="btn gold" id="addEmployeeBtn">+ إضافة موظف</button></div><div class="toolbar"><div class="search"><span>⌕</span><input id="employeeSearch" placeholder="ابحث باسم الموظف أو الرقم أو المسمى..."></div><select id="employeeDeptFilter"><option value="">كل الإدارات</option></select></div><div id="employeesTable" class="employees-table"></div></div><div id="evaluationView" class="view hidden"><div class="page-head"><div><span class="eyebrow">HR • PERFORMANCE</span><h2>التقييم الإلكتروني KPI</h2><p>التقييم مرتبط بالمسمى والوصف الوظيفي للموظف.</p></div><button class="btn gold" id="startEvaluationBtn">بدء تقييم موظف</button></div><div id="evaluationHome" class="evaluation-home"></div></div></section></main></div><div id="detailModal" class="modal hidden"><div class="modal-card detail-card"><button class="close" data-close="detailModal">×</button><div id="detail"></div></div></div>
+<aside class="sidebar">
+  <div class="nav-title">التنقل الرئيسي</div>
+  <button class="main-nav active" data-view="jobs" id="jobNav"><span>▦</span><b>الوصف الوظيفي</b><i>⌄</i></button>
+  <div id="jobDepartments" class="subnav"></div>
+  <div id="departments" style="display:none"></div><button id="allDeptBtn" style="display:none"></button>
+  <button class="main-nav" data-view="employees"><span>♙</span><b>الموظفين</b><i></i></button>
+  <button class="main-nav" data-view="evaluation"><span>✓</span><b>التقييم الإلكتروني KPI</b><i></i></button>
+  <div class="note"><b>مكتبة داخلية</b><br>الأوصاف مخصصة للوظائف الحالية داخل الشركة وليست لإعلانات التوظيف.</div>
+</aside>
+<section class="content">
+  <div id="jobsView" class="view">
+    <div class="hero"><div><span class="eyebrow">HR • JOB DESCRIPTION</span><h2>مكتبة الوصف الوظيفي</h2><p>ابحث عن الوظيفة، راجع مسؤولياتها ومؤشرات الأداء، ثم اطبع الوصف أو احفظه بصيغة PDF. التعديلات تُحفظ مركزيًا على Supabase.</p></div><div class="stats"><div><strong id="jobCount">0</strong><span>وظيفة</span></div><div><strong id="deptCount">0</strong><span>قسم</span></div></div></div>
+    <div class="toolbar"><div class="search"><span>⌕</span><input id="search" placeholder="ابحث باسم الوظيفة أو القسم أو المسؤول المباشر..."></div><select id="sort"><option value="name">ترتيب: اسم الوظيفة</option><option value="dept">ترتيب: القسم</option></select></div>
+    <div id="jobs" class="jobs"></div><div id="empty" class="empty hidden">لا توجد وظائف مطابقة للبحث الحالي.</div>
+  </div>
+  <div id="employeesView" class="view hidden">
+    <div class="page-head"><div><span class="eyebrow">HR • EMPLOYEES</span><h2>قسم الموظفين</h2><p>إدارة الموظفين وربط كل موظف بالمسمى والوصف الوظيفي ومؤشرات الأداء.</p></div><button class="btn gold" id="addEmployeeBtn">+ إضافة موظف</button></div>
+    <div class="toolbar"><div class="search"><span>⌕</span><input id="employeeSearch" placeholder="ابحث باسم الموظف أو الرقم أو المسمى..."></div><select id="employeeDeptFilter"><option value="">كل الإدارات</option></select></div>
+    <div id="employeesTable" class="employees-table"></div>
+  </div>
+  <div id="evaluationView" class="view hidden">
+    <div class="page-head"><div><span class="eyebrow">HR • PERFORMANCE</span><h2>التقييم الإلكتروني KPI</h2><p>التقييم مرتبط بالمسمى والوصف الوظيفي للموظف.</p></div><button class="btn gold" id="startEvaluationBtn">بدء تقييم موظف</button></div>
+    <div id="evaluationHome" class="evaluation-home"></div>
+  </div>
+</section>
+</main></div>
+<div id="detailModal" class="modal hidden"><div class="modal-card detail-card"><button class="close" data-close="detailModal">×</button><div id="detail"></div></div></div>
 <div id="employeeModal" class="modal hidden"><div class="modal-card employee-form-card"><button class="close" data-close="employeeModal">×</button><div class="form-head"><span class="eyebrow">ملف الموظف</span><h2 id="employeeFormTitle">إضافة موظف</h2></div><form id="employeeForm"><input type="hidden" id="employeeId"><div class="form-grid"><label>الرقم الوظيفي<input id="eNo"></label><label>اسم الموظف<input id="eName" required></label><label>رقم الهوية / الإقامة<input id="eNationalId"></label><label>الجنسية<input id="eNationality"></label><label>الإدارة<select id="eDept"></select></label><label>المسمى الوظيفي<select id="eJob" required></select></label><label>الرئيس المباشر<input id="eManager"></label><label>تاريخ المباشرة<input id="eHireDate" type="date"></label><label>الراتب الأساسي<input id="eBaseSalary" type="number"></label><label>بدل السكن<input id="eHousing" type="number"></label><label>بدل النقل<input id="eTransport" type="number"></label><label>الحالة<input id="eStatus" value="على رأس العمل"></label><label>الجوال<input id="ePhone"></label><label>البريد الإلكتروني<input id="eEmail"></label></div><div id="employeeLinkedJob" class="linked-job"></div><div class="form-actions"><button type="button" class="btn ghost" data-close="employeeModal">إلغاء</button><button class="btn gold" type="submit">حفظ وربط بالوصف الوظيفي</button></div></form></div></div><div id="fileModal" class="modal hidden"><div class="modal-card employee-file-card"><button class="close" data-close="fileModal">×</button><div id="employeeFile"></div></div></div><div id="formModal" class="modal hidden"><div class="modal-card form-card"><button class="close" data-close="formModal">×</button><div class="form-head"><span class="eyebrow">إدارة المكتبة</span><h2 id="formTitle">إضافة وصف وظيفي</h2></div>
 <form id="jobForm"><input type="hidden" id="jobId"><div class="form-grid">
 <label>المسمى الوظيفي<input id="fName" required></label><label>الإدارة / القسم<input id="fDept" list="deptList" required></label><label>الرئيس المباشر<input id="fManager"></label><label>تاريخ آخر تحديث<input id="fDate" type="date"></label></div>
