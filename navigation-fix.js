@@ -76,10 +76,9 @@
     showMainView("jobs");
     if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
     /* تأكد من تحميل مكتبة الوظائف قبل بناء القائمة الجانبية، ثم أعد رسمها بعد اكتمال الطلب. */
-    if(typeof window.loadJobs==="function"){
-      Promise.resolve(window.loadJobs()).then(function(){
-        if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
-      }).catch(function(err){console.error("Job library load failed:",err);});
+    if(typeof window.loadJobs==="function" && typeof window.refreshMainDepartments==="function"){
+      Promise.resolve(window.loadJobs()).then(function(){ window.refreshMainDepartments(); })
+        .catch(function(err){console.error("Job library load failed:",err);});
     }
     (function refreshJobMenu(attempt){
       if(typeof window.refreshMainDepartments==="function") window.refreshMainDepartments();
