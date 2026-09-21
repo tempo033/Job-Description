@@ -11,7 +11,7 @@
 <div class="app">
 <header class="topbar">
 <div class="brand"><div class="brand-mark">HR</div><div><h1>مكتبة الأوصاف الوظيفية</h1><p>مرجع داخلي للموظفين والإدارة والموارد البشرية • 118 وظيفة / 15 قسمًا</p></div></div>
-<div class="top-actions"><button class="btn ghost" id="exportBtn">تصدير البيانات</button><label class="btn ghost import-label">استيراد البيانات<input id="importInput" type="file" accept=".json"></label><button class="btn gold" id="addBtn">+ إضافة وظيفة</button></div>
+<div class="top-actions"><button class="btn ghost" id="exportBtn">تصدير البيانات</button><label class="btn ghost import-label">استيراد Excel للموظفين<input id="employeeExcelInput" type="file" accept=".xlsx,.xls,.csv"></label><button class="btn ghost" id="evaluateBtn">تقييم موظف</button><label class="btn ghost import-label">استيراد JSON<input id="importInput" type="file" accept=".json"></label><button class="btn gold" id="addBtn">+ إضافة وظيفة</button></div>
 </header>
 <main class="layout">
 <aside class="sidebar"><div class="side-head"><h2>الأقسام</h2><button id="allDeptBtn" class="mini active">الكل</button></div><div id="departments"></div><div class="note"><b>مكتبة داخلية</b><br>الأوصاف مخصصة للوظائف الحالية داخل الشركة وليست لإعلانات التوظيف.</div></aside>
@@ -31,6 +31,6 @@
 <label>مؤشرات الأداء KPI<textarea id="fKpi" rows="5"></textarea><small>كل مؤشر في سطر مستقل.</small></label>
 <label>متطلبات الالتزام والانضباط<textarea id="fCompliance" rows="4"></textarea></label>
 <div class="form-actions"><button type="button" class="btn ghost" data-close="formModal">إلغاء</button><button class="btn gold" type="submit">حفظ في قاعدة البيانات</button></div></form></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="app.js"></script>
 </body></html>
