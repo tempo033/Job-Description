@@ -372,6 +372,5 @@ loadJobs();
     });
     showView("jobs");
   }
-  window.openEmployeeForm=populateEmployeeForm;window.renderEmployeesPanel=renderEmployeesPanel;window.refreshMainDepartments=renderMainDepartments;
-  setTimeout(async()=>{ await loadEmployees(); initNewUI(); },300);
+  window.openEmployeeForm=populateEmployeeForm;window.renderEmployeesPanel=renderEmployeesPanel;window.refreshMainDepartments=renderMainDepartments;window.loadEmployees=loadEmployees;
 })();
