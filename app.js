@@ -337,10 +337,6 @@ loadJobs();
   function renderEvaluationPanel(){const total=employees.length,linked=employees.filter(linkedJob).length;q("#evaluationHome").innerHTML='<div class="eval-summary"><div class="summary-card"><strong>'+total+'</strong><span>إجمالي الموظفين</span></div><div class="summary-card"><strong>'+linked+'</strong><span>مرتبطون بوصف وظيفي</span></div><div class="summary-card"><strong>'+(total-linked)+'</strong><span>يحتاجون إسناد مسمى</span></div></div>'}
   function initNewUI(){
     renderMainDepartments();
-    document.querySelectorAll(".main-nav").forEach(n=>n.addEventListener("click",()=>showView(n.dataset.view)));
-    q("#jobNav").addEventListener("click",()=>q("#jobDepartments").classList.toggle("collapsed"));
-    q("#addEmployeeBtn").addEventListener("click",()=>populateEmployeeForm(""));
-    q("#startEvaluationBtn").addEventListener("click",()=>window.openEvaluation());
     document.addEventListener("input",ev=>{
       if(ev.target.id==="employeeSearch"){selectedEmployeeIds.clear();renderEmployeesPanel();}
     });
